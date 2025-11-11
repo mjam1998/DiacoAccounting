@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $fillable=[
+        'name',
         'transaction_type_id',
         'commission',
         'tax',

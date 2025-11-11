@@ -21,4 +21,6 @@ Route::prefix('admin')->middleware('auth')->group(function(){
     Route::post('/bankAccount/editPrimary',[\App\Http\Controllers\UserController::class,'editPrimary'])->name('editPrimary');
     Route::get('/bankAccount/list',[\App\Http\Controllers\UserController::class,'bankAccountList'])->name('bankAccount.list');
     Route::post('/bankAccount/add',[\App\Http\Controllers\UserController::class,'addBankAccount'])->name('addBankAccount');
+    Route::get('/percentTransactionCategory',[\App\Http\Controllers\UserController::class,'percentTransactionCategory'])->name('percentTransactionCategory');
+    Route::post('/percentTransactionCategory/submit',[\App\Http\Controllers\UserController::class,'percentTransactionCategorySubmit'])->name('percentTransactionCategory.submit');
 });

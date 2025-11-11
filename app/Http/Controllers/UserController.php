@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Bank_account;
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -104,6 +105,24 @@ class UserController extends Controller
             'status'=>2
         ]);
         return redirect(route('bankAccount.list'))->with('addAccount','اطلاعات با موفقیت افزوده شد.');
+    }
+
+    public function percentTransactionCategory()
+    {
+        $categories=Category::query()->where('transaction_type_id',1)->get();
+        return view('adminPanel.percentSellTransaction',compact('categories'));
+    }
+
+    public function percentTransactionCategorySubmit(Request $request)
+    {
+        $category=Category::query()->where('id',$request['id'])->first();
+
+        $category->update([
+          'commission'=>$request['commission'],
+            'tax'=>$request['tax'],
+            'logistics'=>$request['logistics']
+        ]);
+        return redirect(route('percentTransactionCategory'))->with('submitPercent','اطلاعات با موفقیت ثبت شد.');
     }
 
 }

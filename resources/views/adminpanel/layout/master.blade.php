@@ -32,6 +32,11 @@
                     <i class=" icon ti-package bi bi-bank"></i>
                 </a>
             </li>
+            <li data-toggle="tooltip" title=" تنظیم درصد تراکنش های فروش">
+                <a href="#percentCategory" title=" تنظیم درصد تراکنش های فروش">
+                    <i class="icon ti-user bi bi-percent"></i>
+                </a>
+            </li>
             <li data-toggle="tooltip" title="ادمین">
                 <a href="#users" title=" ادمین">
                     <i class="icon ti-user"></i>
@@ -42,6 +47,7 @@
                     <i class="icon ti-user bi bi-credit-card"></i>
                 </a>
             </li>
+
             <li data-toggle="tooltip" title=" طلب های قسطی">
                 <a href="#debts" title=" طلب های قسطی">
                     <i class="icon ti-user bi bi-cash-coin"></i>
@@ -66,6 +72,15 @@
                 <ul>
                     <li><a href="{{route('AdminAdd')}}">ایجاد ادمین</a></li>
                     <li><a href="{{route('AdminList')}}">لیست ادمین</a></li>
+                </ul>
+            </li>
+        </ul>
+        <ul id="percentCategory">
+            <li>
+                <a href="#">تنظیم درصد</a>
+                <ul>
+                    <li><a href="{{route('percentTransactionCategory')}}"> تنظیم درصد تراکنش های فروش</a></li>
+
                 </ul>
             </li>
         </ul>
