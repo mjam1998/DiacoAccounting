@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-
+    <link rel="stylesheet" href="{{asset('AdminPanel/assets/css/persian-datepicker.min.css')}}"/>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body class="small-navigation">
@@ -77,11 +77,11 @@
         </ul>
         <ul id="percentCategory">
             <li>
-                <a href="#">تنظیم درصد</a>
-                <ul>
-                    <li><a href="{{route('percentTransactionCategory')}}"> تنظیم درصد تراکنش های فروش</a></li>
+                <a href="{{route('percentTransactionCategory')}}">تنظیم درصد</a>
+               {{-- <ul>
+                    <li><a href=""> تنظیم درصد تراکنش های فروش</a></li>
 
-                </ul>
+                </ul>--}}
             </li>
         </ul>
         <ul id="banks">
@@ -91,6 +91,12 @@
                     <li><a href="{{route('bankAccount.primary')}}">حساب اصلی نقدی دردسترس </a></li>
                     <li><a href="{{route('bankAccount.list')}}">لیست حساب های بانکی دیگر</a></li>
                 </ul>
+            </li>
+        </ul>
+        <ul id="transaction">
+            <li>
+                <a href="{{route('AdminHome')}}">تراکنش ها</a>
+
             </li>
         </ul>
 
@@ -157,11 +163,26 @@
 <script src="{{asset('AdminPanel/vendors/vmap/jquery.vmap.min.js')}}"></script>
 <script src="{{asset('AdminPanel/assets/js/app.js')}}"></script>
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
+<script src="{{asset('AdminPanel/assets/js/persian-date.min.js')}}"></script>
+<script src="{{asset('AdminPanel/assets/js/persian-datepicker.min.js')}}"></script>
 <script type="text/javascript">
-    $(document).ready(function () {
-        $('#datatable').dataTable();
-        $( '#datepicker' ).datepicker();
+    $(document).ready(function() {
+
+        $('.persianDate').persianDatepicker({
+            format: 'YYYY/MM/DD', // فقط سال/ماه/روز
+            timePicker: {
+                enabled: false // غیرفعال کردن انتخاب زمان
+            },
+            toolbox: {
+                calendarSwitch: {
+                    enabled: false // غیرفعال کردن سوئیچ تقویم
+                }
+            },
+            observer: true,
+            altField: '#dateInput'
+        });
     });
 </script>
+
 </body>
 </html>

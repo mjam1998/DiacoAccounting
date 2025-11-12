@@ -9,12 +9,18 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Morilog\Jalali\Jalalian;
 
 class UserController extends Controller
 {
     public function adminHome()
     {
-        return view('adminPanel.user.adminHome');
+        $categories = Category::all();
+        $sellCategories=$categories->where('transaction_type_id',1);
+        $costCategories=$categories->where('transaction_type_id',2);
+        $adCategories=$categories->where('transaction_type_id',3);
+        $bankAccounts=Bank_account::query()->whereNot('id',1)->get();
+        return view('adminPanel.transaction',['sellCategories'=>$sellCategories,'costCategories'=>$costCategories,'adCategories'=>$adCategories,'bankAccounts'=>$bankAccounts]);
     }
     public function adminList(){
         $users=User:: query()->withTrashed()->get();
@@ -123,6 +129,28 @@ class UserController extends Controller
             'logistics'=>$request['logistics']
         ]);
         return redirect(route('percentTransactionCategory'))->with('submitPercent','اطلاعات با موفقیت ثبت شد.');
+    }
+
+    public function transactionSubmit(Request $request)
+    {
+        $data=$request->all();
+        $normalizedDate =$this->normalizePersianDate($request['created_at']); // 1377/07/22
+        $gregorianDate = Jalalian::fromFormat('Y/m/d', $normalizedDate)
+            ->toCarbon()
+            ->format('Y-m-d');
+        dd($gregorianDate);
+    }
+    public function normalizePersianDate($date)
+    {
+        // تبدیل اعداد فارسی به انگلیسی
+        $persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        $english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        $date = str_replace($persian, $english, $date);
+
+        // حذف فاصله و کاراکترهای اضافی
+        $date = preg_replace('/[^\d\/]/', '', $date);
+
+        return $date;
     }
 
 }
