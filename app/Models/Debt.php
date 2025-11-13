@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Debt extends Model
 {
     protected $fillable = [
-        'transaction_id',
+        'category_id',
         'debt1',
         'debt2',
         'debt3',
@@ -20,6 +20,7 @@ class Debt extends Model
         'debt2_isPaid',
         'debt3_isPaid',
         'debt4_isPaid',
+        'created_at'
     ];
     protected $casts = [
         'debt1_isPaid'=>'boolean',
@@ -27,7 +28,10 @@ class Debt extends Model
         'debt3_isPaid'=>'boolean',
         'debt4_isPaid'=>'boolean'
     ];
-    public function transaction(){
-        return $this->belongsTo(Transaction::class);
+    public function category(){
+        return $this->belongsTo(Category::class);
+    }
+    public function transactions(){
+        return $this->hasMany(Transaction::class);
     }
 }

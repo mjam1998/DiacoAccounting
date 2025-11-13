@@ -20,4 +20,8 @@ class Category extends Model
     public function transactions(){
         return $this->hasMany(Transaction::class);
     }
+    public function debt()
+    {
+        return $this->hasMany(Debt::class);
+    }
 }

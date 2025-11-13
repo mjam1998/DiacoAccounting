@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('debts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('transaction_id');
+            $table->unsignedBigInteger('category_id');
             $table->decimal('debt1',15,0);
             $table->date('debt1_time');
             $table->boolean('debt1_isPaid')->default(false);
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->date('debt4_time')->nullable();
             $table->boolean('debt4_isPaid')->default(false);
             $table->timestamps();
-            $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('cascade');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }
 

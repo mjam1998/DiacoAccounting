@@ -13,7 +13,13 @@ class Transaction extends Model
         'buyPrice',
         'sellPrice',
         'isDebt',
-        'description'
+        'description',
+        'profit',
+        'commission',
+        'logistics',
+        'tax',
+        'created_at',
+        'debt_id'
     ];
     protected  $casts = [
         'isDebt' => 'boolean'
@@ -28,9 +34,9 @@ class Transaction extends Model
     public function bank_account(){
         return $this->belongsTo(Bank_account::class);
     }
-    public function debt()
-    {
-        return $this->hasone(Debt::class);
+    public function debt(){
+        return $this->belongsTo(Debt::class);
     }
+
 
 }

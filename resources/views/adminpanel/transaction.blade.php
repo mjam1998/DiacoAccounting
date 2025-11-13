@@ -7,7 +7,9 @@
 @section('content')
 
         <h4 class="card-title">تراکنش ها</h4>
-
+ @if(session()->has('success'))
+     <p class="alert alert-success">{{session('success')}}</p>
+ @endif
          <div class="row ">
 
                  <h5 style="margin-left: 20px;" >ثبت تراکنش جدید:</h5>
@@ -166,7 +168,43 @@
 
 
 
+        <div class="row " style="margin-top: 100px">
+            <div class="col-12">
+                <div class="table-responsive">
+                    <h5>لیست تراکنش ها</h5>
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">آیدی</th>
+                            <th scope="col">نوع تراکنش</th>
+                            <th scope="col">دسته بندی</th>
+                            <th scope="col">قیمت فروش</th>
+                            <th scope="col">قیمت خرید</th>
+                            <th scope="col">تاریخ ثبت</th>
+                            <th scope="col">حذف</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($transactions as $transaction)
+                            <tr>
+                                <td>{{ $transaction->id }}</td>
+                                <td>
+                                 {{$transaction->transaction_type->name}}
 
+                                </td>
+                                <td>{{ $transaction->category->name }}</td>
+                                <td>{{ number_format($transaction->sellPrice) }}</td>
+                                <td>{{number_format($transaction->buyPrice)  }}</td>
+
+                                <td>{{ $transaction->persian_date }}</td>
+                                <td><button class="btn btn-danger">حذف</button></td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
 
 
