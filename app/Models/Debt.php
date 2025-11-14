@@ -34,4 +34,17 @@ class Debt extends Model
     public function transactions(){
         return $this->hasMany(Transaction::class);
     }
+    public function getUnpaidAmountAttribute(): int
+    {
+        $total = 0;
+        for ($i = 1; $i <= 4; $i++) {
+            $amountField = "debt{$i}";
+            $paidField = "debt{$i}_isPaid";
+
+            if ($this->$amountField !== null && ! $this->$paidField) {
+                $total += $this->$amountField;
+            }
+        }
+        return $total;
+    }
 }

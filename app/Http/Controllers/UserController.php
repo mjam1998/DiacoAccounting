@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Morilog\Jalali\Jalalian;
 
 class UserController extends Controller
@@ -24,6 +25,114 @@ class UserController extends Controller
         $adCategories=$categories->where('transaction_type_id',3);
         $bankAccounts=Bank_account::query()->whereNot('id',1)->get();
         $transactions=Transaction::query()->orderBy('id','desc')->get();
+
+        $sellTransaction=$transactions->where('transaction_type_id',1);
+        $taxAmount=$sellTransaction->sum('tax');
+        $logisticsAmount=$sellTransaction->sum('logistics');
+         $commissionAmount=$sellTransaction->sum('commission');
+        $taxAmount=$sellTransaction->sum('tax');
+        $sellTransTotalAmount=$sellTransaction->sum('sellPrice');
+        $profitTotalAmount=$sellTransaction->sum('profit');
+        $snapTrans=$sellTransaction->where('category_id',1)->sum('sellPrice');
+        $snapProfit=$sellTransaction->where('category_id',1)->sum('profit');
+        $torobTrans=$sellTransaction->where('category_id',2)->sum('sellPrice');
+        $torobProfit=$sellTransaction->where('category_id',2)->sum('profit');
+        $basalamTrans=$sellTransaction->where('category_id',3)->sum('sellPrice');
+        $basalamProfit=$sellTransaction->where('category_id',3)->sum('profit');
+        $siteTrans=$sellTransaction->where('category_id',4)->sum('sellPrice');
+        $siteProfit=$sellTransaction->where('category_id',4)->sum('profit');
+        $naghdiTrans=$sellTransaction->where('category_id',5)->sum('sellPrice');
+        $naghdiProfit=$sellTransaction->where('category_id',5)->sum('profit');
+        $digikalaTrans=$sellTransaction->where('category_id',6)->sum('sellPrice');
+        $digikalaProfit=$sellTransaction->where('category_id',6)->sum('profit');
+        $snapshopTrans=$sellTransaction->where('category_id',7)->sum('sellPrice');
+        $snapshopProfit=$sellTransaction->where('category_id',7)->sum('profit');
+        $pasajTrans=$sellTransaction->where('category_id',8)->sum('sellPrice');
+        $pasajProfit=$sellTransaction->where('category_id',8)->sum('profit');
+        $instaTrans=$sellTransaction->where('category_id',9)->sum('sellPrice');
+        $instaProfit=$sellTransaction->where('category_id',9)->sum('profit');
+
+        $costTransaction=$transactions->where('transaction_type_id',2);
+        $costTransTotalAmount=$costTransaction->sum('buyPrice');
+        $costKari=$costTransaction->where('category_id',10)->sum('buyPrice');
+        $costShakhsi=$costTransaction->where('category_id',11)->sum('buyPrice');
+
+        $adsTransaction=$transactions->where('transaction_type_id',3);
+        $adsTransTotalAmount=$adsTransaction->sum('buyPrice');
+        $snapAds=$adsTransaction->where('category_id',12)->sum('buyPrice');
+        $torobAds=$adsTransaction->where('category_id',13)->sum('buyPrice');
+        $instaAds=$adsTransaction->where('category_id',14)->sum('buyPrice');
+        $basalamAds=$adsTransaction->where('category_id',15)->sum('buyPrice');
+        $googleAds=$adsTransaction->where('category_id',16)->sum('buyPrice');
+        $pasajAds=$adsTransaction->where('category_id',17)->sum('buyPrice');
+        $seoAds=$adsTransaction->where('category_id',18)->sum('buyPrice');
+
+
+        $wallet=Bank_account::query()->where('status',1)->first();
+
+
+        $totalUnpaid = Debt::all()->sum->unpaid_amount;
+
+
+        $unpaidForCategory = function ($categoryId) {
+            return Debt::where('category_id', $categoryId)
+                ->get()
+                ->sum->unpaid_amount;
+        };
+        $unpaidCat1 = $unpaidForCategory(1);
+        $unpaidCat2 = $unpaidForCategory(2);
+        $unpaidCat3 = $unpaidForCategory(3);
+        $unpaidCat8 = $unpaidForCategory(8);
+
+        $paidTaxForCategory = function ($categoryId) {
+            return Transaction::query()
+                ->where('transaction_type_id', 1)
+                ->where('category_id', $categoryId)
+                ->sum('tax');
+        };
+        $paidTaxCat1 = $paidTaxForCategory(1);
+        $paidTaxCat2 = $paidTaxForCategory(2);
+        $paidTaxCat3 = $paidTaxForCategory(3);
+        $paidTaxCat4 = $paidTaxForCategory(4);
+        $paidTaxCat5 = $paidTaxForCategory(5);
+        $paidTaxCat6 = $paidTaxForCategory(6);
+        $paidTaxCat7 = $paidTaxForCategory(7);
+        $paidTaxCat8 = $paidTaxForCategory(8);
+        $paidTaxCat9 = $paidTaxForCategory(9);
+
+        $commissionForCategory = function ($categoryId) {
+            return Transaction::query()
+                ->where('transaction_type_id', 1)
+                ->where('category_id', $categoryId)
+                ->sum('commission');
+        };
+        $logisticsForCategory = function ($categoryId) {
+            return Transaction::query()
+                ->where('transaction_type_id', 1)
+                ->where('category_id', $categoryId)
+                ->sum('logistics');
+        };
+        // ۹ متغیر جداگانه برای کمیسیون
+        $commissionCat1 = $commissionForCategory(1);
+        $commissionCat2 = $commissionForCategory(2);
+        $commissionCat3 = $commissionForCategory(3);
+        $commissionCat4 = $commissionForCategory(4);
+        $commissionCat5 = $commissionForCategory(5);
+        $commissionCat6 = $commissionForCategory(6);
+        $commissionCat7 = $commissionForCategory(7);
+        $commissionCat8 = $commissionForCategory(8);
+        $commissionCat9 = $commissionForCategory(9);
+
+        // ۹ متغیر جداگانه برای لجستیک
+        $logisticsCat1 = $logisticsForCategory(1);
+        $logisticsCat2 = $logisticsForCategory(2);
+        $logisticsCat3 = $logisticsForCategory(3);
+        $logisticsCat4 = $logisticsForCategory(4);
+        $logisticsCat5 = $logisticsForCategory(5);
+        $logisticsCat6 = $logisticsForCategory(6);
+        $logisticsCat7 = $logisticsForCategory(7);
+        $logisticsCat8 = $logisticsForCategory(8);
+        $logisticsCat9 = $logisticsForCategory(9);
         foreach ($transactions as $transaction) {
             $date = Carbon::parse($transaction->created_at);
             $persianDate = Jalalian::fromCarbon($date)->format('Y/m/d');
@@ -31,7 +140,84 @@ class UserController extends Controller
 
             $transaction->persian_date = $persianDate;
         }
-        return view('adminPanel.transaction',['sellCategories'=>$sellCategories,'costCategories'=>$costCategories,'adCategories'=>$adCategories,'bankAccounts'=>$bankAccounts,'transactions'=>$transactions]);
+
+        return view('adminPanel.transaction',[
+            'sellCategories'=>$sellCategories,
+            'costCategories'=>$costCategories,
+            'adCategories'=>$adCategories,
+            'bankAccounts'=>$bankAccounts,
+            'transactions'=>$transactions,
+            'sellTransTotalAmount'=>$sellTransTotalAmount,
+            'snapTrans'=>$snapTrans,
+            'torobTrans'=>$torobTrans,
+            'basalamTrans'=>$basalamTrans,
+            'siteTrans'=>$siteTrans,
+            'naghdiTrans'=>$naghdiTrans,
+            'digikalaTrans'=>$digikalaTrans,
+            'snapshopTrans'=>$snapshopTrans,
+            'pasajTrans'=>$pasajTrans,
+            'instaTrans'=>$instaTrans,
+            'costTransTotalAmount'=>$costTransTotalAmount,
+            'costKari'=>$costKari,
+            'costShakhsi'=>$costShakhsi,
+            'adsTransTotalAmount'=>$adsTransTotalAmount,
+            'snapAds'=>$snapAds,
+            'torobAds'=>$torobAds,
+            'instaAds'=>$instaAds,
+            'basalamAds'=>$basalamAds,
+            'googleAds'=>$googleAds,
+            'pasajAds'=>$pasajAds,
+            'seoAds'=>$seoAds,
+            'wallet'=>$wallet['wallet'],
+            'profitTotalAmount'=>$profitTotalAmount,
+            'snapProfit'=>$snapProfit,
+            'torobProfit'=>$torobProfit,
+            'basalamProfit'=>$basalamProfit,
+            'siteProfit'=>$siteProfit,
+            'naghdiProfit'=>$naghdiProfit,
+            'digikalaProfit'=>$digikalaProfit,
+            'snapshopProfit'=>$snapshopProfit,
+            'pasajProfit'=>$pasajProfit,
+            'instaProfit'=>$instaProfit,
+            'totalUnpaid'=>$totalUnpaid,
+            'unpaidCat1'=>$unpaidCat1,
+            'unpaidCat2'=>$unpaidCat2,
+            'unpaidCat3'=>$unpaidCat3,
+            'unpaidCat8'=>$unpaidCat8,
+            'taxAmount'=>$taxAmount,
+            'paidTaxCat1'=>$paidTaxCat1,
+            'paidTaxCat2'=>$paidTaxCat2,
+            'paidTaxCat3'=>$paidTaxCat3,
+            'paidTaxCat4'=>$paidTaxCat4,
+            'paidTaxCat5'=>$paidTaxCat5,
+            'paidTaxCat6'=>$paidTaxCat6,
+            'paidTaxCat7'=>$paidTaxCat7,
+            'paidTaxCat8'=>$paidTaxCat8,
+            'paidTaxCat9'=>$paidTaxCat9,
+            'commissionCat1'=>$commissionCat1,
+            'commissionCat2'=>$commissionCat2,
+            'commissionCat3'=>$commissionCat3,
+            'commissionCat4'=>$commissionCat4,
+            'commissionCat5'=>$commissionCat5,
+            'commissionCat6'=>$commissionCat6,
+            'commissionCat7'=>$commissionCat7,
+            'commissionCat8'=>$commissionCat8,
+            'commissionCat9'=>$commissionCat9,
+            'logisticsCat1'=>$logisticsCat1,
+            'logisticsCat2'=>$logisticsCat2,
+            'logisticsCat3'=>$logisticsCat3,
+            'logisticsCat4'=>$logisticsCat4,
+            'logisticsCat5'=>$logisticsCat5,
+            'logisticsCat6'=>$logisticsCat6,
+            'logisticsCat7'=>$logisticsCat7,
+            'logisticsCat8'=>$logisticsCat8,
+            'logisticsCat9'=>$logisticsCat9,
+            'logisticsAmount'=>$logisticsAmount,
+            'commissionAmount'=>$commissionAmount,
+
+
+
+        ]);
     }
     public function adminList(){
         $users=User:: query()->withTrashed()->get();
@@ -161,7 +347,7 @@ class UserController extends Controller
                 $logistics = $category['logistics'];
                 $amountCommission = $request['sellPrice'] * ($commission/100);
                 $amountTax = $amountCommission * ($tax/100);
-                $debtAmount = ($request['sellPrice'] - ($amountCommission + $amountTax)) / 4;
+                $debtAmount = ($request['sellPrice'] - ($amountCommission + $amountTax+$logistics)) / 4;
                 $profit = $request['sellPrice'] - ($request['buyPrice'] + $amountCommission + $amountTax + $logistics);
 
 
@@ -234,7 +420,7 @@ class UserController extends Controller
                 $logistics = $category['logistics'];
                 $amountCommission = $request['sellPrice'] * ($commission/100);
                 $amountTax = $amountCommission * ($tax/100);
-                $debtAmount = $request['sellPrice'] - ($amountCommission + $amountTax) ;
+                $debtAmount = $request['sellPrice'] - ($amountCommission + $amountTax+$logistics) ;
                 $profit = $request['sellPrice'] - ($request['buyPrice'] + $amountCommission + $amountTax + $logistics);
 
 
@@ -298,7 +484,7 @@ class UserController extends Controller
                 $logistics = $category['logistics'];
                 $amountCommission = $request['sellPrice'] * ($commission/100);
                 $amountTax = $amountCommission * ($tax/100);
-                $debtAmount = $request['sellPrice'] - ($amountCommission + $amountTax) ;
+                $debtAmount = $request['sellPrice'] - ($amountCommission + $amountTax+$logistics) ;
                 $profit = $request['sellPrice'] - ($request['buyPrice'] + $amountCommission + $amountTax + $logistics);
 
 
@@ -335,11 +521,12 @@ class UserController extends Controller
 
                         'created_at' => $gregorianDate
                     ]);
+                    session('debtNID',$debtN['id']);
                 }
 
                 Transaction::query()->create([
                     'transaction_type_id' => 1,
-                    'debt_id'=>$debtN['id'],
+                    'debt_id'=>session('debtNID'),
                     'category_id' => $request['category_id'],
                     'buyPrice' => $request['buyPrice'],
                     'sellPrice' => $request['sellPrice'],
@@ -426,6 +613,104 @@ class UserController extends Controller
 
         }
         return redirect()->route('AdminHome')->with('success','تراکنش با موفقیت ثبت شد.');
+    }
+
+    public function transactionDelete($id)
+    {
+        $transaction = Transaction::query()->find($id);
+        $cash=Bank_account::query()->where('status',1)->first();
+        if($transaction['transaction_type_id'] == 1){
+            $debt=Debt::query()->find($transaction['debt_id']);
+            if($transaction['category_id'] == 1 || $transaction['category_id'] == 2 ){
+                $debtAmount = ($transaction['sellPrice'] - ($transaction['commission'] + $transaction['tax'] + $transaction['logistics']))/4;
+                $debt->update([
+                   'debt1' => $debt['debt1'] - $debtAmount,
+                    'debt2' => $debt['debt2'] - $debtAmount,
+                    'debt3' => $debt['debt3'] - $debtAmount,
+                    'debt4' => $debt['debt4'] - $debtAmount
+                ]);
+                if($debt['debt1'] == 0){
+                    $debt->delete();
+                }
+            }elseif($transaction['category_id'] == 3 || $transaction['category_id'] ==8 ){
+                $debtAmount = $transaction['sellPrice'] - ($transaction['commission'] + $transaction['tax'] + $transaction['logistics']);
+                $debt->update([
+                    'debt1' => $debt['debt1'] - $debtAmount,
+
+                ]);
+                if($debt['debt1'] == 0){
+                    $debt->delete();
+                }
+            }else{
+                $cash->update([
+                   'wallet' => $cash['wallet'] - $transaction['profit']
+                ]);
+            }
+
+        }else{
+            $cash->update([
+                'wallet' => $cash['wallet'] - $transaction['buyPrice']
+            ]);
+        }
+      $transaction->delete();
+        return redirect()->route('AdminHome')->with('deleteSucces','تراکنش با موفقیت حذف شد.');
+    }
+
+    public function debtList()
+    {
+        // بارگذاری رابطه category
+        $debts = Debt::with('category')->get();
+
+        // جدا کردن پرداخت شده و پرداخت نشده
+        $unpaidDebts = $debts->filter(function ($debt) {
+            return
+                !$debt->debt1_isPaid ||
+                ($debt->debt2 && !$debt->debt2_isPaid) ||
+                ($debt->debt3 && !$debt->debt3_isPaid) ||
+                ($debt->debt4 && !$debt->debt4_isPaid);
+        });
+
+        $paidDebts = $debts->filter(function ($debt) {
+            return
+                $debt->debt1_isPaid &&
+                (!$debt->debt2 || $debt->debt2_isPaid) &&
+                (!$debt->debt3 || $debt->debt3_isPaid) &&
+                (!$debt->debt4 || $debt->debt4_isPaid);
+        });
+
+        return view('adminpanel.debt.list', compact('unpaidDebts', 'paidDebts'));
+    }
+    public function payInstallment(Debt $debt, Request $request)
+    {
+        $installment = $request->input('installment'); // 1, 2, 3, 4
+        $field = "debt{$installment}";
+        $isPaidField = "debt{$installment}_isPaid";
+        $timeField = "debt{$installment}_time";
+
+        // بررسی وجود قسط
+        if (!$debt->$field) {
+            return back()->with('error', "قسط {$installment} وجود ندارد.");
+        }
+
+        // بررسی اینکه قبلاً پرداخت شده یا نه
+        if ($debt->$isPaidField) {
+            return back()->with('warning', "قسط {$installment} قبلاً پرداخت شده است.");
+        }
+
+        // دریافت مبلغ قسط
+        $amount = $debt->$field;
+
+        // ثبت پرداخت
+        $debt->$isPaidField = true;
+        $debt->save();
+
+        $cash=Bank_account::query()->where('status',1)->first();
+        $cash->update([
+           'wallet' => $cash['wallet'] + $amount
+        ]);
+
+
+        return back()->with('success', "قسط {$installment} با موفقیت پرداخت شد.");
     }
     public function normalizePersianDate($date)
     {

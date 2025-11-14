@@ -16,6 +16,9 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{asset('AdminPanel/assets/css/persian-datepicker.min.css')}}"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.bootstrap5.min.css">
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body class="small-navigation">
@@ -82,6 +85,15 @@
                     <li><a href=""> تنظیم درصد تراکنش های فروش</a></li>
 
                 </ul>--}}
+            </li>
+        </ul>
+        <ul id="debts">
+            <li>
+                <a href="{{route('debt.list')}}"> طلب ها</a>
+                {{-- <ul>
+                     <li><a href=""> تنظیم درصد تراکنش های فروش</a></li>
+
+                 </ul>--}}
             </li>
         </ul>
         <ul id="banks">
@@ -165,6 +177,17 @@
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
 <script src="{{asset('AdminPanel/assets/js/persian-date.min.js')}}"></script>
 <script src="{{asset('AdminPanel/assets/js/persian-datepicker.min.js')}}"></script>
+
+
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.bootstrap5.min.js"></script>
+
+
+<script src="https://cdn.datatables.net/responsive/3.0.2/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/3.0.2/js/responsive.bootstrap5.min.js"></script>
+
 <script type="text/javascript">
     $(document).ready(function() {
 
@@ -181,6 +204,41 @@
             observer: true,
             altField: '#dateInput'
         });
+        $('.datatable').DataTable({
+            "language": {
+                "decimal": "",
+                "emptyTable": "هیچ داده‌ای موجود نیست",
+                "info": "نمایش _START_ تا _END_ از _TOTAL_ رکورد",
+                "infoEmpty": "نمایش 0 تا 0 از 0 رکورد",
+                "infoFiltered": "(فیلتر شده از _MAX_ رکورد)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "نمایش _MENU_ رکورد",
+                "loadingRecords": "در حال بارگذاری...",
+                "processing": "در حال پردازش...",
+                "search": "جستجو:",
+                "zeroRecords": "رکوردی یافت نشد",
+                "paginate": {
+                    "first": "اولین",
+                    "last": "آخرین",
+                    "next": "بعدی",
+                    "previous": "قبلی"
+                },
+                "aria": {
+                    "sortAscending": ": فعال سازی برای مرتب‌سازی صعودی",
+                    "sortDescending": ": فعال سازی برای مرتب‌سازی نزولی"
+                }
+            },
+            "pageLength": 10,
+            "lengthMenu": [5, 10, 25, 50],
+            "responsive": true,
+            "autoWidth": true,
+            "scrollX": false,
+            "order": [[0, "desc"]], // مرتب‌سازی بر اساس ستون اول (آیدی) به صورت نزولی
+
+
+        });
+
     });
 </script>
 

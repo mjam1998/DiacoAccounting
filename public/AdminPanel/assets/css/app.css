@@ -11512,3 +11512,36 @@ body.dark .ui-datepicker select {
     color: inherit;
     border-color: #404356;
 }
+/* هدر جدول: سیاه با متن سفید */
+.table-container table.dataTable thead th {
+    background-color: #000 !important;
+    color: #fff !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    font-weight: 700;
+    border: none !important;
+    padding: 1rem !important;
+}
+
+/* بدنه جدول: وسط‌چین کردن همه سلول‌ها */
+.table-container table.dataTable tbody td {
+    text-align: center !important;
+    vertical-align: middle !important;
+    padding: 1rem !important;
+}
+
+/* اطمینان از وسط‌چین بودن کل جدول */
+#datatable {
+    text-align: center;
+}
+
+#datatable th,
+#datatable td {
+    text-align: center !important;
+}
+
+/* حذف استایل‌های متضاد قبلی (اگر وجود دارد) */
+table.dataTable thead th,
+table.dataTable tbody td {
+    text-align: center !important;
+}

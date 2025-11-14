@@ -37,6 +37,11 @@ class Transaction extends Model
     public function debt(){
         return $this->belongsTo(Debt::class);
     }
+    public function scopePaidTaxes($query)
+    {
+        return $query->where('tax', '>', 0);
+
+    }
 
 
 }

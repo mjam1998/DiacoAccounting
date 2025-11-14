@@ -24,5 +24,8 @@ Route::prefix('admin')->middleware('auth')->group(function(){
     Route::get('/percentTransactionCategory',[\App\Http\Controllers\UserController::class,'percentTransactionCategory'])->name('percentTransactionCategory');
     Route::post('/percentTransactionCategory/submit',[\App\Http\Controllers\UserController::class,'percentTransactionCategorySubmit'])->name('percentTransactionCategory.submit');
     Route::post('/transaction/submit',[\App\Http\Controllers\UserController::class,'transactionSubmit'])->name('transaction.submit');
+    Route::get('transaction/delete/{id}',[\App\Http\Controllers\UserController::class,'transactionDelete'])->name('transaction.delete');
+    Route::get('/debt/list',[\App\Http\Controllers\UserController::class,'debtList'])->name('debt.list');
+    Route::patch('/admin/debt/{debt}/pay',[\App\Http\Controllers\UserController::class,'payInstallment'])->name('admin.debt.pay');
 
 });

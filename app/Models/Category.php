@@ -20,8 +20,12 @@ class Category extends Model
     public function transactions(){
         return $this->hasMany(Transaction::class);
     }
-    public function debt()
+    public function debts()
     {
         return $this->hasMany(Debt::class);
+    }
+    public function getUnpaidTotalAttribute(): int
+    {
+        return $this->debts->sum->unpaid_amount;
     }
 }
