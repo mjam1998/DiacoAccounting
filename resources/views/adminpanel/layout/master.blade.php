@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.bootstrap5.min.css">
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="small-navigation">
 <div class="navigation">
@@ -76,6 +77,15 @@
                     <li><a href="{{route('AdminAdd')}}">ایجاد ادمین</a></li>
                     <li><a href="{{route('AdminList')}}">لیست ادمین</a></li>
                 </ul>
+            </li>
+        </ul>
+        <ul id="checks">
+            <li>
+                <a href="{{route('bankChecks')}}"> چک های بانکی</a>
+                {{-- <ul>
+                     <li><a href=""> تنظیم درصد تراکنش های فروش</a></li>
+
+                 </ul>--}}
             </li>
         </ul>
         <ul id="percentCategory">
@@ -241,6 +251,7 @@
 
     });
 </script>
+
 
 </body>
 </html>

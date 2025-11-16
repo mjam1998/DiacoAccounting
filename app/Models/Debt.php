@@ -22,18 +22,28 @@ class Debt extends Model
         'debt4_isPaid',
         'created_at'
     ];
+
     protected $casts = [
-        'debt1_isPaid'=>'boolean',
-        'debt2_isPaid'=>'boolean',
-        'debt3_isPaid'=>'boolean',
-        'debt4_isPaid'=>'boolean'
+        'debt1_isPaid' => 'boolean',
+        'debt2_isPaid' => 'boolean',
+        'debt3_isPaid' => 'boolean',
+        'debt4_isPaid' => 'boolean',
+        'debt1_time' => 'date',
+        'debt2_time' => 'date',
+        'debt3_time' => 'date',
+        'debt4_time' => 'date',
     ];
-    public function category(){
+
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
-    public function transactions(){
+
+    public function transactions()
+    {
         return $this->hasMany(Transaction::class);
     }
+
     public function getUnpaidAmountAttribute(): int
     {
         $total = 0;
@@ -41,7 +51,7 @@ class Debt extends Model
             $amountField = "debt{$i}";
             $paidField = "debt{$i}_isPaid";
 
-            if ($this->$amountField !== null && ! $this->$paidField) {
+            if ($this->$amountField !== null && !$this->$paidField) {
                 $total += $this->$amountField;
             }
         }

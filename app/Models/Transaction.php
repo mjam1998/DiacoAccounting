@@ -31,8 +31,10 @@ class Transaction extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function bank_account(){
-        return $this->belongsTo(Bank_account::class);
+    public function bank_account()
+    {
+        // مهم: کلید خارجی واقعی در دیتابیس را مشخص کنید
+        return $this->belongsTo(Bank_account::class, 'bank_accounts_id');
     }
     public function debt(){
         return $this->belongsTo(Debt::class);
