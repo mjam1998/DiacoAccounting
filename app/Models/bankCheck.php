@@ -10,7 +10,8 @@ class bankCheck extends Model
       'bankAccount_id',
       'check_amount',
       'check_date',
-        'description'
+        'description',
+        'is_paid'
     ];
     public function bankAccount(){
         return $this->belongsTo(Bank_account::class, 'bankAccount_id');

@@ -56,9 +56,10 @@
                 <div class="form-group row" >
                     <label class="col-sm-2 col-form-label">انتخاب حساب چک:</label>
                     <div class="col-sm-3">
+
                         <select name="bankAccount_id" class="form-select form-control" >
                             <option selected>یک گزینه را انتخاب کنید...</option>
-
+                            <option value="1" > حساب نقدی ها </option>
                             @foreach($bankAccounts as $bankAccount)
                                 <option value="{{$bankAccount->id}}" > بانک {{$bankAccount->bank_name}} به نام {{$bankAccount->name}}</option>
                             @endforeach
@@ -109,7 +110,14 @@
                                 <td>{{ $check->id }}</td>
                                 <td>{{number_format($check->check_amount)  }} تومان</td>
                                 <td>{{$check->persianDate }}</td>
-                                <td>  بانک {{$check->bankAccount->bank_name}} به نام {{$check->bankAccount->name}}</td>
+                                <td>
+                                    @if($check->bankAccount_id==1)حساب نقدی ها
+                                        @else
+                                    بانک
+                                    {{$check->bankAccount->bank_name}} به نام {{$check->bankAccount->name}}
+                                    @endif
+
+                                </td>
                                 <td>{{ $check->description }}</td>
                                 <td>{{ $check->persianCreate }}</td>
                                 <td><a href="{{route('bankCheck.delete',['id'=>$check->id])}}" class="btn btn-danger" style="color: white">حذف</a></td>

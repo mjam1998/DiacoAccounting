@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('description');
 
             $table->timestamps();
+            $table->boolean('is_paid')->nullable();
             $table->foreign('bankAccount_id')->references('id')->on('bank_accounts');
         });
     }

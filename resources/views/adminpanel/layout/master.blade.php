@@ -21,6 +21,48 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.bootstrap5.min.css">
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+    <style>
+        /* فاصله زیبا بین کادر جستجو و انتخاب تعداد رکورد */
+        div.dataTables_wrapper div.dataTables_length,
+        div.dataTables_wrapper div.dataTables_filter {
+            margin-bottom: 15px !important;
+        }
+
+        /* در دسکتاپ: هر کدوم یه طرف باشن (جستجو چپ، تعداد رکورد راست) */
+        @media (min-width: 768px) {
+            div.dataTables_wrapper div.dataTables_length {
+                float: right;           /* راست */
+                text-align: right;
+            }
+            div.dataTables_wrapper div.dataTables_filter {
+                float: left;            /* چپ */
+                text-align: left;
+            }
+            div.dataTables_wrapper div.dataTables_filter input {
+                margin-right: 10px;     /* فاصله بین متن "جستجو:" و کادر */
+                min-width: 200px;
+            }
+        }
+
+        /* در موبایل: زیر هم با فاصله قشنگ */
+        @media (max-width: 767px) {
+            div.dataTables_wrapper div.dataTables_length,
+            div.dataTables_wrapper div.dataTables_filter {
+                text-align: center !important;
+                float: none !important;
+            }
+            div.dataTables_wrapper div.dataTables_filter {
+                margin-top: 15px;
+            }
+            div.dataTables_wrapper div.dataTables_filter input {
+                width: 100% !important;
+                max-width: 300px;
+                margin: 0 auto;
+                display: block;
+            }
+        }
+    </style>
 </head>
 <body class="small-navigation">
 <div class="navigation">
@@ -91,10 +133,10 @@
         <ul id="percentCategory">
             <li>
                 <a href="{{route('percentTransactionCategory')}}">تنظیم درصد</a>
-               {{-- <ul>
-                    <li><a href=""> تنظیم درصد تراکنش های فروش</a></li>
+                {{-- <ul>
+                     <li><a href=""> تنظیم درصد تراکنش های فروش</a></li>
 
-                </ul>--}}
+                 </ul>--}}
             </li>
         </ul>
         <ul id="debts">
@@ -140,22 +182,22 @@
             </nav>
         </div>
 
-            <!-- end::breadcrumb -->
-            <div class="header-body-right">
-                <div class="d-flex align-items-center">
-                    <!-- begin::navbar navigation toggler -->
-                    <div class="d-xl-none d-lg-none d-sm-block navigation-toggler">
-                        <a href="#">
-                            <i class="ti-menu"></i>
-                        </a>
-                    </div>
-                    <!-- end::navbar navigation toggler -->
-
-                    <!-- begin::navbar toggler -->
-
-                    <!-- end::navbar toggler -->
+        <!-- end::breadcrumb -->
+        <div class="header-body-right">
+            <div class="d-flex align-items-center">
+                <!-- begin::navbar navigation toggler -->
+                <div class="d-xl-none d-lg-none d-sm-block navigation-toggler">
+                    <a href="#">
+                        <i class="ti-menu"></i>
+                    </a>
                 </div>
+                <!-- end::navbar navigation toggler -->
+
+                <!-- begin::navbar toggler -->
+
+                <!-- end::navbar toggler -->
             </div>
+        </div>
 
 
 
@@ -166,10 +208,10 @@
 <!-- end::header -->
 <!-- begin::main content -->
 <main class="main-content">
-  <div class="card">
+    <div class="card">
         <div class="card-body">
 
-                @yield('content')
+            @yield('content')
 
         </div>
     </div>
@@ -189,8 +231,7 @@
 <script src="{{asset('AdminPanel/assets/js/persian-datepicker.min.js')}}"></script>
 
 
-<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
-<script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.min.js"></script>
+
 <script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.bootstrap5.min.js"></script>
 
@@ -214,12 +255,14 @@
             observer: true,
             altField: '#dateInput'
         });
-        $('.datatable').DataTable({
+
+        // این خط جدید اضافه کن — همه جدول‌ها با کلاس table-striped فارسی میشن
+        $.extend(true, $.fn.dataTable.defaults, {
             "language": {
                 "decimal": "",
                 "emptyTable": "هیچ داده‌ای موجود نیست",
                 "info": "نمایش _START_ تا _END_ از _TOTAL_ رکورد",
-                "infoEmpty": "نمایش 0 تا 0 از 0 رکورد",
+                "infoEmpty": "نمایش ۰ تا ۰ از ۰ رکورد",
                 "infoFiltered": "(فیلتر شده از _MAX_ رکورد)",
                 "infoPostFix": "",
                 "thousands": ",",
@@ -238,16 +281,20 @@
                     "sortAscending": ": فعال سازی برای مرتب‌سازی صعودی",
                     "sortDescending": ": فعال سازی برای مرتب‌سازی نزولی"
                 }
-            },
-            "pageLength": 10,
-            "lengthMenu": [5, 10, 25, 50],
-            "responsive": true,
-            "autoWidth": true,
-            "scrollX": false,
-            "order": [[0, "desc"]], // مرتب‌سازی بر اساس ستون اول (آیدی) به صورت نزولی
-
-
+            }
         });
+
+        // حالا فقط جدول‌هایی که کلاس datatable دارن رو فعال کن (صفحه تراکنش‌ها نداره، پس فقط بقیه صفحات)
+        $('.datatable').DataTable({
+            "responsive": false,
+            "scrollX": true,
+            "autoWidth": false,
+            "pageLength": 10,
+            "order": [[0, "desc"]],
+            "initComplete": function () { this.api().columns.adjust().draw(); },
+            "drawCallback": function () { this.api().columns.adjust(); }
+        });
+
 
     });
 </script>

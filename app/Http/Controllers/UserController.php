@@ -33,6 +33,21 @@ class UserController extends Controller
         // متغیر برای نمایش هشدار (بدون Session)
         $showOverdueAlert = $overdueDebts->isNotEmpty();
 
+        $dueChecks = BankCheck::query()
+            ->where('bankAccount_id',1)
+            ->where('is_paid',0)
+            ->whereNotNull('check_date')
+            ->whereDate('check_date', '<=', Carbon::today())
+            ->get();
+        $cashAmount1=Bank_account::query()->find(1);
+        foreach ($dueChecks as $dueCheck) {
+            $cashAmount1->update([
+                'wallet'=>$cashAmount1['wallet']-$dueCheck->check_amount
+            ]);
+            $dueCheck->update([
+                'is_paid'=>1
+            ]);
+        }
 
         $categories = Category::all();
         $sellCategories = $categories->where('transaction_type_id', 1);
@@ -51,6 +66,7 @@ class UserController extends Controller
         $logisticsAmount = $sellTransaction->sum('logistics');
         $commissionAmount = $sellTransaction->sum('commission');
         $sellTransTotalAmount = $sellTransaction->sum('sellPrice');
+        $capitalAmount = $sellTransaction->sum('buyPrice');
         $profitTotalAmount = $sellTransaction->sum('profit');
 
         $snapTrans = $sellTransaction->where('category_id', 1)->sum('sellPrice');
@@ -118,6 +134,12 @@ class UserController extends Controller
         $logisticsCat7 = $this->sumField(7, 'logistics'); $logisticsCat8 = $this->sumField(8, 'logistics');
         $logisticsCat9 = $this->sumField(9, 'logistics');
 
+        $capCat1 = $this->sumField(1, 'buyPrice'); $capCat2 = $this->sumField(2, 'buyPrice');
+        $capCat3 = $this->sumField(3, 'buyPrice'); $capCat4 = $this->sumField(4, 'buyPrice');
+        $capCat5 = $this->sumField(5, 'buyPrice'); $capCat6 = $this->sumField(6, 'buyPrice');
+        $capCat7 = $this->sumField(7, 'buyPrice'); $capCat8 = $this->sumField(8, 'buyPrice');
+        $capCat9 = $this->sumField(9, 'buyPrice');
+
         // --- نمودارها ---
 
         // در UserController@adminHome
@@ -165,7 +187,7 @@ class UserController extends Controller
             'adToRevenueRatio', 'overallROI', 'beforeAfterAd',
             'period', 'periodLabel',
             'salesPeriod',  'expensePeriod', 'adPeriod','showOverdueAlert',
-        'overdueDebts'
+        'overdueDebts','capitalAmount','capCat1', 'capCat2', 'capCat3', 'capCat4', 'capCat5','capCat6','capCat7','capCat8','capCat9'
         ))->header('Cache-Control', 'no-cache, no-store, must-revalidate')
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
@@ -298,10 +320,13 @@ class UserController extends Controller
                 $logistics = $category['logistics'];
                 $amountCommission = $request['sellPrice'] * ($commission/100);
                 $amountTax = $amountCommission * ($tax/100);
-                $debtAmount = ($request['sellPrice'] - ($amountCommission + $amountTax+$logistics)) / 4;
+                $debtAmount = ($request['sellPrice'] - ($amountCommission + $amountTax)) / 4;
                 $profit = $request['sellPrice'] - ($request['buyPrice'] + $amountCommission + $amountTax + $logistics);
 
-
+                 $cashAmount2=Bank_account::query()->find(1);
+                 $cashAmount2->update([
+                    'wallet'=>$cashAmount2['wallet'] - $logistics
+                 ]);
                 $currentJalali = $inputJalaliDate;
 
                 // تبدیل به محدوده میلادی برای جستجو
@@ -387,9 +412,12 @@ class UserController extends Controller
                 $logistics = $category['logistics'];
                 $amountCommission = $request['sellPrice'] * ($commission/100);
                 $amountTax = $amountCommission * ($tax/100);
-                $debtAmount = $request['sellPrice'] - ($amountCommission + $amountTax+$logistics) ;
+                $debtAmount = $request['sellPrice'] - ($amountCommission + $amountTax) ;
                 $profit = $request['sellPrice'] - ($request['buyPrice'] + $amountCommission + $amountTax + $logistics);
-
+                $cashAmount2=Bank_account::query()->find(1);
+                $cashAmount2->update([
+                    'wallet'=>$cashAmount2['wallet'] - $logistics
+                ]);
 
                 $currentJalali = $inputJalaliDate;
 
@@ -465,11 +493,17 @@ class UserController extends Controller
                 $tax = $category['tax'];
                 $logistics = $category['logistics'];
                 $amountCommission = $request['sellPrice'] * ($commission/100);
+                if ($amountCommission>150000){
+                    $amountCommission=150000;
+                }
                 $amountTax = $amountCommission * ($tax/100);
-                $debtAmount = $request['sellPrice'] - ($amountCommission + $amountTax+$logistics) ;
+                $debtAmount = $request['sellPrice'] - ($amountCommission + $amountTax) ;
                 $profit = $request['sellPrice'] - ($request['buyPrice'] + $amountCommission + $amountTax + $logistics);
 
-
+                $cashAmount2=Bank_account::query()->find(1);
+                $cashAmount2->update([
+                    'wallet'=>$cashAmount2['wallet'] - $logistics
+                ]);
                 $currentJalali = $inputJalaliDate;
 
 
@@ -538,6 +572,38 @@ class UserController extends Controller
 
 
 
+            }
+            elseif ($request['category_id'] == 4){
+                $category = Category::query()->where('id', $request['category_id'])->first();
+                $commission = $category['commission'];
+                $tax = $category['tax'];
+                $logistics = $category['logistics'];
+                $amountCommission = $request['sellPrice'] * ($commission/100);
+                if ($amountCommission>12000){
+                    $amountCommission=12000;
+                }
+                $amountTax = $amountCommission * ($tax/100);
+
+                $profit = $request['sellPrice'] - ($request['buyPrice'] + $amountCommission + $amountTax + $logistics);
+
+                Transaction::query()->create([
+                    'transaction_type_id' => 1,
+                    'category_id' => $request['category_id'],
+                    'buyPrice' => $request['buyPrice'],
+                    'sellPrice' => $request['sellPrice'],
+                    'isDebt' => false,
+                    'description' => $request['description'],
+                    'profit' => $profit,
+                    'commission' => $amountCommission,
+                    'logistics' => $logistics,
+                    'tax' => $amountTax,
+                    'created_at' => $gregorianDate
+                ]);
+
+                $cash=Bank_account::query()->where('status',1)->first();
+                $cash->update([
+                    'wallet' => $cash['wallet'] + $profit
+                ]);
             }
             else{
                 $category = Category::query()->where('id', $request['category_id'])->first();
@@ -737,7 +803,7 @@ class UserController extends Controller
             }
         }
 
-        $bankAccounts=Bank_account::all();
+        $bankAccounts = Bank_account::query()->whereNot('id', 1)->get();
         return view('adminpanel.bankCheck', compact('checks', 'bankAccounts'));
     }
 
@@ -751,12 +817,16 @@ class UserController extends Controller
         // تاریخ میلادی برای ذخیره در تراکنش
         $gregorianDate = $inputJalaliDate->toCarbon()->format('Y-m-d');
 
-        Bankcheck::query()->create([
+        $bankCheck=Bankcheck::query()->create([
             'bankAccount_id'=>$request['bankAccount_id'],
             'check_amount'=>$request['check_amount'],
             'check_date'=>$gregorianDate,
             'description'=>$request['description'],
         ]);
+        if($bankCheck['bankAccount_id']==1){
+            $bankCheck->is_paid=0;
+            $bankCheck->save();
+        }
         return back()->with('addcheck','چک با موفقیت ثبت شد.');
     }
 
