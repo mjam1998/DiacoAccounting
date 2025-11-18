@@ -250,6 +250,7 @@ class UserController extends Controller
     {
         $bank=Bank_account::query()->where('status',1)->first();
         $bank->update([
+            'wallet'=>$request['wallet'],
             'name'=>$request['name'],
             'bank_name'=>$request['bank_name'],
             'account_number'=>$request['account_number'],
@@ -681,7 +682,7 @@ class UserController extends Controller
         if($transaction['transaction_type_id'] == 1){
             $debt=Debt::query()->find($transaction['debt_id']);
             if($transaction['category_id'] == 1 || $transaction['category_id'] == 2 ){
-                $debtAmount = ($transaction['sellPrice'] - ($transaction['commission'] + $transaction['tax'] + $transaction['logistics']))/4;
+                $debtAmount = ($transaction['sellPrice'] - ($transaction['commission'] + $transaction['tax'] ))/4;
                 $debt->update([
                     'debt1' => $debt['debt1'] - $debtAmount,
                     'debt2' => $debt['debt2'] - $debtAmount,
@@ -691,8 +692,12 @@ class UserController extends Controller
                 if($debt['debt1'] == 0){
                     $debt->delete();
                 }
+                $wallet=Bank_account::query()->find(1);
+                $wallet->update([
+                    'wallet' => $wallet['wallet'] + $transaction['logistics']
+                ]);
             }elseif($transaction['category_id'] == 3 || $transaction['category_id'] ==8 ){
-                $debtAmount = $transaction['sellPrice'] - ($transaction['commission'] + $transaction['tax'] + $transaction['logistics']);
+                $debtAmount = $transaction['sellPrice'] - ($transaction['commission'] + $transaction['tax']);
                 $debt->update([
                     'debt1' => $debt['debt1'] - $debtAmount,
 
@@ -700,15 +705,19 @@ class UserController extends Controller
                 if($debt['debt1'] == 0){
                     $debt->delete();
                 }
+                $wallet=Bank_account::query()->find(1);
+                $wallet->update([
+                    'wallet' => $wallet['wallet'] + $transaction['logistics']
+                ]);
             }else{
                 $cash->update([
-                    'wallet' => $cash['wallet'] - $transaction['profit']
+                    'wallet' => $cash['wallet'] + $transaction['profit']
                 ]);
             }
 
         }else{
             $cash->update([
-                'wallet' => $cash['wallet'] - $transaction['buyPrice']
+                'wallet' => $cash['wallet'] + $transaction['buyPrice']
             ]);
         }
         $transaction->delete();

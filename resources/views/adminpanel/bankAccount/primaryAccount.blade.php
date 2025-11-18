@@ -18,7 +18,9 @@
                 <div class="form-group row">
                     <label  class="col-sm-2 col-form-label"> موجودی حساب نقدی دردسترس(تومان) </label>
                     <div class="col-sm-3">
-                        <input type="text" id="walletAmount" class="form-control text-left" value="{{$bank->wallet}}"  dir="rtl" readonly >
+
+                        <input type="text" id="walletAmount" class="form-control text-left money-display"  value="{{number_format($bank->wallet)}}"  dir="rtl"  >
+                        <input type="hidden" class="money-value" name="wallet">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -68,27 +70,49 @@
 
 
 </div>
+
 <script>
-    function formatNumber(num) {
-        // تبدیل به عدد و سپس فرمت کردن
-        const number = parseFloat(num) || 0;
-        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        // همه فیلدهای نمایش قیمت را پیدا کن
+        const moneyDisplays = document.querySelectorAll('.money-display');
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const walletElement = document.getElementById('walletAmount');
+        moneyDisplays.forEach(function (moneyDisplay) {
+            // فیلد مخفی مرتبط را در همان فرم یا والد نزدیک پیدا کن
+            // اگر name="sellPrice" در hidden input هست، از آن استفاده کن
+            const moneyValue = moneyDisplay.parentElement.querySelector('input[name="sellPrice"]') ||
+                moneyDisplay.closest('.form-group').querySelector('.money-value');
 
-        if (walletElement) {
-            const currentValue = walletElement.value || walletElement.textContent;
-            const formattedValue = formatNumber(currentValue);
-
-            // اگر input است
-            if (walletElement.type === 'text') {
-                walletElement.value = formattedValue;
-            } else { // اگر element دیگر است
-                walletElement.textContent = formattedValue;
+            // اگر فیلد مخفی پیدا نشد، می‌توانیم آن را بسازیم (اختیاری)
+            if (!moneyValue) {
+                console.warn('فیلد مخفی .money-value یا input[name="sellPrice"] پیدا نشد برای:', moneyDisplay);
+                return;
             }
-        }
+
+            // تابع فرمت کردن عدد
+            function formatNumber(num) {
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+
+            // وقتی کاربر تایپ می‌کند
+            moneyDisplay.addEventListener('input', function () {
+                let value = this.value.replace(/[^\d]/g, ''); // فقط اعداد
+
+                // ذخیره مقدار خام در فیلد مخفی
+                moneyValue.value = value;
+
+                // نمایش فرمت‌شده
+                this.value = value ? formatNumber(value) : '';
+            });
+
+            // هنگام لود صفحه، اگر مقدار اولیه داشت، فرمت کن
+            if (moneyDisplay.value.trim() !== '') {
+                let rawValue = moneyDisplay.value.replace(/[^\d]/g, '');
+                if (rawValue) {
+                    moneyDisplay.value = formatNumber(rawValue);
+                    moneyValue.value = rawValue;
+                }
+            }
+        });
     });
 </script>
 @endsection

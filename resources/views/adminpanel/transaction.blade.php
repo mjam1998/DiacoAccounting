@@ -398,19 +398,17 @@
             position: relative;
             overflow: hidden;
             animation: slideUp 0.6s ease-out;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
+            border: 3px solid transparent;
+
 
             transition: all 0.4s ease;
         }
 
         /* حاشیه رنگی بالا — هماهنگ با نوع تراکنش */
-        #section-sale { border-top-color: #10b981 !important; }    /* سبز زمردی */
-        #section-cost { border-top-color: #ef4444 !important; }    /* قرمز */
-        #section-ad   { border-top-color: #8b5cf6 !important; }    /* بنفش مدرن */
-        #section-sale { border-bottom-color: #10b981 !important; }   /* سبز زمردی */
-        #section-cost { border-bottom-color: #ef4444 !important; }   /* قرمز */
-        #section-ad   { border-bottom-color: #8b5cf6 !important; }
+        #section-sale { border-color: #10b981 !important; }    /* سبز زمردی */
+        #section-cost { border-color: #ef4444 !important; }    /* قرمز */
+        #section-ad   { border-color: #8b5cf6 !important; }    /* بنفش مدرن */
+
 
         /* عنوان داخل هر فرم */
         .transaction-section h5 {
@@ -568,6 +566,36 @@
             margin-right: 12px;
             font-size: 1.4rem;
             opacity: 0.9;
+        }
+        /* ===== رنگ متن داخل select ها رو همیشه تیره و خوانا کن ===== */
+        .transaction-section select,
+        .transaction-section .form-select,
+        .transaction-section .form-control[role="combobox"] {
+            color: #212529 !important;           /* رنگ متن تیره (مشکی خاکستری) */
+            -webkit-appearance: none;            /* حذف استایل پیش‌فرض مرورگر */
+            appearance: none;
+        }
+
+        /* مخصوصاً گزینه انتخاب‌شده در کروم/اج */
+        .transaction-section select option:checked {
+            color: #212529 !important;
+            background: #e9ecef !important;      /* زمینه خاکستری ملایم برای گزینه انتخاب‌شده */
+        }
+
+        /* وقتی فوکوس داره هم مطمئن بشیم رنگ درست باشه */
+        .transaction-section select:focus,
+        .transaction-section .form-select:focus {
+            color: #212529 !important;
+            background: white !important;
+        }
+        .transaction-section select,
+        .transaction-section .form-select {
+            color: #212529 !important;
+            padding: 16px 18px !important;     /* پدینگ بیشتر برای وسط شدن */
+            line-height: normal !important;
+            height: 58px !important;           /* ارتفاع ثابت = پدینگ بالا + پایین + خط */
+            display: flex !important;
+            align-items: center !important;
         }
     </style>
 
@@ -779,6 +807,7 @@
                         <th scope="col">دسته بندی</th>
                         <th scope="col">قیمت فروش(تومان)</th>
                         <th scope="col">قیمت خرید(تومان)</th>
+                        <th scope="col">توضیحات</th>
                         <th scope="col">تاریخ ثبت</th>
                         <th scope="col">حذف</th>
                     </tr>
@@ -794,6 +823,7 @@
                             <td>{{ $transaction->category->name }}</td>
                             <td>{{ number_format($transaction->sellPrice) }}</td>
                             <td>{{number_format($transaction->buyPrice)  }}</td>
+                            <td>{{$transaction->description }}</td>
 
                             <td>{{ $transaction->persian_date }}</td>
                             <td><a href="{{route('transaction.delete',['id'=>$transaction->id])}}" class="btn btn-danger" style="color: white">حذف</a></td>
