@@ -33,21 +33,15 @@ class UserController extends Controller
         // متغیر برای نمایش هشدار (بدون Session)
         $showOverdueAlert = $overdueDebts->isNotEmpty();
 
-        $dueChecks = BankCheck::query()
-            ->where('bankAccount_id',1)
-            ->where('is_paid',0)
-            ->whereNotNull('check_date')
-            ->whereDate('check_date', '<=', Carbon::today())
+        // چک‌های معوق: تاریخ سررسید گذشته و is_paid = 0
+        $overdueChecks = BankCheck::query()->where('is_paid', 0)
+            ->whereDate('check_date', '<=', $today) // فرض می‌کنم فیلد تاریخ سررسید check_date هست
+            ->orderBy('check_date')
             ->get();
-        $cashAmount1=Bank_account::query()->find(1);
-        foreach ($dueChecks as $dueCheck) {
-            $cashAmount1->update([
-                'wallet'=>$cashAmount1['wallet']-$dueCheck->check_amount
-            ]);
-            $dueCheck->update([
-                'is_paid'=>1
-            ]);
-        }
+
+        // متغیر برای نمایش هشدار
+        $showOverdueCheckAlert = $overdueChecks->isNotEmpty();
+
 
         $categories = Category::all();
         $sellCategories = $categories->where('transaction_type_id', 1);
@@ -187,7 +181,8 @@ class UserController extends Controller
             'adToRevenueRatio', 'overallROI', 'beforeAfterAd',
             'period', 'periodLabel',
             'salesPeriod',  'expensePeriod', 'adPeriod','showOverdueAlert',
-        'overdueDebts','capitalAmount','capCat1', 'capCat2', 'capCat3', 'capCat4', 'capCat5','capCat6','capCat7','capCat8','capCat9'
+        'overdueDebts','capitalAmount','capCat1', 'capCat2', 'capCat3', 'capCat4', 'capCat5','capCat6','capCat7',
+            'capCat8','capCat9','showOverdueCheckAlert','overdueChecks'
         ))->header('Cache-Control', 'no-cache, no-store, must-revalidate')
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
@@ -817,17 +812,33 @@ class UserController extends Controller
         // تاریخ میلادی برای ذخیره در تراکنش
         $gregorianDate = $inputJalaliDate->toCarbon()->format('Y-m-d');
 
-        $bankCheck=Bankcheck::query()->create([
+        Bankcheck::query()->create([
             'bankAccount_id'=>$request['bankAccount_id'],
             'check_amount'=>$request['check_amount'],
             'check_date'=>$gregorianDate,
             'description'=>$request['description'],
         ]);
-        if($bankCheck['bankAccount_id']==1){
-            $bankCheck->is_paid=0;
-            $bankCheck->save();
-        }
+
         return back()->with('addcheck','چک با موفقیت ثبت شد.');
+    }
+
+    public function bankCheckPaid(Request $request)
+    {
+
+        $check=bankCheck::query()->where('id',$request['check_id'])->first();
+        $check->update([
+            'is_paid'=>1
+        ]);
+        if ($check['bankAccount_id']==1){
+            $wallet=Bank_account::query()->where('id',1)->first();
+            $wallet->update([
+                'wallet'=>$wallet['wallet'] - $check['check_amount']
+            ]);
+        }
+        return response()->json([
+            'success' => true,
+            'message' => 'چک با موفقیت پرداخت شد.'
+        ]);
     }
 
     public function bankCheckDelete($id)

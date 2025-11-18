@@ -189,7 +189,7 @@
 
         /* هاور: بالا آمدن + سایه خیلی سیاه و قوی */
         .report-buttons-wrapper .btn:hover {
-            transform: translateY(-3px) scale(1.02);
+            transform: translateY(-2px) scale(1.02);
             box-shadow:
                 0 20px 40px rgba(0, 0, 0, 0.4),
                 0 12px 20px rgba(0, 0, 0, 0.3),
@@ -394,14 +394,13 @@
             margin-top: 40px !important;
             padding: 30px;
             border-radius: 24px;
-            box-shadow:
-                0 15px 35px rgba(0, 0, 0, 0.15),
-                0 5px 15px rgba(0, 0, 0, 0.1);
             background: white;
             position: relative;
             overflow: hidden;
             animation: slideUp 0.6s ease-out;
             border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+
             transition: all 0.4s ease;
         }
 
@@ -409,6 +408,9 @@
         #section-sale { border-top-color: #10b981 !important; }    /* سبز زمردی */
         #section-cost { border-top-color: #ef4444 !important; }    /* قرمز */
         #section-ad   { border-top-color: #8b5cf6 !important; }    /* بنفش مدرن */
+        #section-sale { border-bottom-color: #10b981 !important; }   /* سبز زمردی */
+        #section-cost { border-bottom-color: #ef4444 !important; }   /* قرمز */
+        #section-ad   { border-bottom-color: #8b5cf6 !important; }
 
         /* عنوان داخل هر فرم */
         .transaction-section h5 {
@@ -578,6 +580,26 @@
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">×</span>
             </button>
+        </div>
+    @endif
+    <!-- هشدار چک‌های معوق -->
+    @if($showOverdueCheckAlert && $overdueChecks->isNotEmpty())
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>⚠️ هشدار چک معوق!</strong>
+            شما <strong>{{ $overdueChecks->count() }}</strong> چک معوق دارید که سررسیدشان گذشته است:
+            <ul class="mb-0 mt-2">
+                @foreach($overdueChecks as $check)
+                    <li>
+                        چک به مبلغ <strong>{{ number_format($check->check_amount) }} تومان</strong>
+
+                        @if($check->description)
+                            ({{ $check->description }})
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+            لطفاً سریعاً در <a href="{{ route('bankChecks') }}" class="alert-link">بخش چک‌ها</a> وضعیت پرداخت را ثبت کنید.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
     @if(session()->has('success'))

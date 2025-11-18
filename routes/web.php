@@ -31,7 +31,10 @@ Route::prefix('admin')->middleware('auth')->group(function(){
     Route::patch('/admin/debt/{debt}/pay',[\App\Http\Controllers\UserController::class,'payInstallment'])->name('admin.debt.pay');
     Route::get('/bankChecks',[\App\Http\Controllers\UserController::class,'bankChecks'])->name('bankChecks');
     Route::post('/bankChecks/submit',[\App\Http\Controllers\UserController::class,'bankCheckSubmit'])->name('bankChecks.submit');
-    Route::get('bankCheck/delete/{id}',[\App\Http\Controllers\UserController::class,'bankCheckDelete'])->name('bankCheck.delete');
+
+    Route::get('/bankCheck/delete/{id}',[\App\Http\Controllers\UserController::class,'bankCheckDelete'])->name('bankCheck.delete');
+
+    Route::post('/bankcheck/paid',[\App\Http\Controllers\UserController::class,'bankCheckPaid'])->name('bankcheck.paid');
 
 
 });

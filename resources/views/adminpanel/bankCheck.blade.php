@@ -6,24 +6,81 @@
 
 @section('content')
     <style>
-        .table-container table.dataTable thead th {
-            background-color: #000 !important;
-            color: #fff !important;
-            text-align: center !important;
-            vertical-align: middle !important;
-            font-weight: 700;
-            border: none !important;
-            padding: 1rem !important;
+        /* کاملاً حذف کردیم .table-responsive رو که اسکرول رو می‌خورد */
+        .listjs-table-wrapper {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: white;
         }
-        .table-container table.dataTable tbody td {
-            text-align: center !important;
-            vertical-align: middle !important;
-            padding: 1rem !important;
+
+        .listjs-table {
+            min-width: 1300px !important;   /* بزرگتر کردم که ۱۰۰٪ اسکرول بده */
+            width: 100%;
+            white-space: nowrap;
+            border-collapse: separate;
+            border-spacing: 0;
         }
-        .datatable th,
-        .datatable td {
-            text-align: center !important;
+
+        .listjs-table th {
+            background: #000 !important;
+            color: white !important;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-align: center;
+            padding: 12px 8px !important;
+            font-weight: bold;
         }
+
+        .listjs-table td {
+            padding: 10px 8px !important;
+            vertical-align: middle;
+        }
+
+        /* صفحه‌بندی حرفه‌ای و همیشه نمایش داده بشه */
+        .listjs-pagination {
+            display: flex !important;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 30px 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .listjs-pagination li {
+            margin: 0;
+        }
+
+        .listjs-pagination a,
+        .listjs-pagination span {
+            display: block;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            color: #333;
+            text-decoration: none;
+            border: 1px solid #dee2e6;
+            min-width: 44px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .listjs-pagination .active a,
+        .listjs-pagination .active span {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .listjs-pagination a:hover:not(.active) {
+            background: #e9ecef;
+        }
+    </style>
     </style>
     <div class="container">
         <h4 class="card-title">  چک ها </h4>
@@ -99,6 +156,7 @@
                             <th scope="col"> مبلغ چک</th>
                             <th scope="col">تاریخ سرسید</th>
                             <th scope="col">حساب برداشت </th>
+                            <th scope="col"> وضعیت</th>
                             <th scope="col"> توضیحات</th>
                             <th scope="col">تاریخ ثبت</th>
                             <th scope="col"> حذف</th>
@@ -106,22 +164,40 @@
                         </thead>
                         <tbody>
                         @foreach($checks as $check)
-                            <tr>
+                            <tr class="{{ $check->is_paid == 0 ? 'table-danger' : '' }}">
                                 <td>{{ $check->id }}</td>
-                                <td>{{number_format($check->check_amount)  }} تومان</td>
-                                <td>{{$check->persianDate }}</td>
+                                <td>{{ number_format($check->check_amount) }} تومان</td>
+                                <td>{{ $check->persianDate }}</td>
                                 <td>
-                                    @if($check->bankAccount_id==1)حساب نقدی ها
-                                        @else
-                                    بانک
-                                    {{$check->bankAccount->bank_name}} به نام {{$check->bankAccount->name}}
+                                    @if($check->bankAccount_id == 1)
+                                        حساب نقدی ها
+                                    @else
+                                        بانک {{ $check->bankAccount->bank_name }} به نام {{ $check->bankAccount->name }}
                                     @endif
-
                                 </td>
-                                <td>{{ $check->description }}</td>
-                                <td>{{ $check->persianCreate }}</td>
-                                <td><a href="{{route('bankCheck.delete',['id'=>$check->id])}}" class="btn btn-danger" style="color: white">حذف</a></td>
+                                <td>
+                                    @if($check->is_paid == 1)
+                                        <span class="badge bg-success">پرداخت شده</span>
+                                    @else
+                                        <span class="badge bg-danger">معوق</span>
 
+                                        <!-- دکمه تایید پرداخت فقط برای چک‌های معوق -->
+                                        <button type="button" class="btn btn-sm btn-primary mt-1 confirm-payment-btn"
+                                                data-id="{{ $check->id }}"
+                                                data-amount="{{ number_format($check->check_amount) }}">
+                                            <i class="ti-check"></i> تایید پرداخت
+                                        </button>
+                                    @endif
+                                </td>
+                                <td>{{ $check->description ?? '-' }}</td>
+                                <td>{{ $check->persianCreate }}</td>
+                                <td>
+                                    <a href="{{ route('bankCheck.delete', ['id' => $check->id]) }}"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('آیا از حذف چک مطمئن هستید؟')">
+                                        حذف
+                                    </a>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -170,6 +246,61 @@
                 // اطمینان از اینکه مقدار عددی است
                 const numericValue = amountInput.value.replace(/[^\d]/g, '');
                 amountInput.value = numericValue;
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.confirm-payment-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const checkId = this.dataset.id;
+                    const amount = this.dataset.amount;
+
+                    Swal.fire({
+                        title: 'تایید پرداخت چک',
+                        html: `<p>آیا از پرداخت چک به مبلغ <strong>${amount} تومان</strong> مطمئن هستید؟</p>`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'بله، پرداخت شد',
+                        cancelButtonText: 'لغو',
+                        reverseButtons: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#dc3545'
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            fetch("{{ url('/admin/bankcheck/paid') }}", {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: JSON.stringify({ check_id: checkId })
+                            })
+                                .then(response => {
+                                    // این خط خیلی مهمه! اول چک کن response.ok باشه
+                                    if (!response.ok) {
+                                        throw new Error(`HTTP ${response.status}`);
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire('موفق!', 'چک با موفقیت پرداخت شد', 'success')
+                                            .then(() => location.reload());
+                                    } else {
+                                        Swal.fire('خطا', data.message || 'عملیات ناموفق بود', 'error');
+                                    }
+                                })
+                                .catch(err => {
+                                    console.error('Ajax Error:', err);
+                                    Swal.fire('خطا', 'ارتباط با سرور برقرار نشد یا خطایی رخ داد.', 'error');
+                                });
+                        }
+                    });
+                });
             });
         });
     </script>
